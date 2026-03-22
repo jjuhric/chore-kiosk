@@ -1,0 +1,11 @@
+# Enforce LF for all files by default to ensure Linux compatibility
+* text=auto eol=lf
+
+# Explicitly keep Windows batch files as CRLF just in case
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# Explicitly enforce LF for shell scripts and config files for the Pi
+*.sh text eol=lf
+Dockerfile text eol=lf
+docker-compose.yml text eol=lf

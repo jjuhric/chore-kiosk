@@ -1,0 +1,35 @@
+# docker-compose.yml
+version: '3.8'
+
+services:
+  backend:
+    build: 
+      context: ./backend
+    container_name: chore_backend
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      # Pass through your `.env` variables (create a .env file in the root if you prefer)
+      - EMAIL_USER=${EMAIL_USER}
+      - EMAIL_PASS=${EMAIL_PASS}
+    volumes:
+      # Persist the SQLite database outside the container lifecycle
+      - kiosk-db-data:/app/database.sqlite
+      # Mount the seed file so the init script can read it on first boot
+      - ./seed.json:/app/seed.json
+
+  frontend:
+    build: 
+      context: ./frontend
+    container_name: chore_frontend
+    restart: unless-stopped
+    ports:
+      - "80:80" # Maps the Pi's port 80 to Nginx
+    depends_on:
+      - backend
+
+volumes:
+  kiosk-db-data:
+    name: chore_kiosk_data
