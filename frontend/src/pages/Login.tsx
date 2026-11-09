@@ -34,7 +34,7 @@ export const Login: React.FC = () => {
         setError(data.error || 'Invalid QR Code');
         setTimeout(() => setError(null), 3000); // Clear error after 3 seconds
       }
-    } catch (err) {
+    } catch {
       setError('Network error connecting to server.');
     }
   };
@@ -146,7 +146,7 @@ export const Login: React.FC = () => {
                 } else {
                   alert(`Error: ${data.error}`);
                 }
-              } catch (e) {
+              } catch {
                 alert('Network error triggering generation.');
               }
             }} 

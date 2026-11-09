@@ -11,7 +11,12 @@ interface Assignment { id: number; chore_id: number; user_id: number; status: st
 function Carousel<T>({ items, renderItem, emptyMessage, itemsPerPage = 2 }: { items: T[], renderItem: (item: T) => React.ReactNode, emptyMessage: string, itemsPerPage?: number }) {
   const [startIndex, setStartIndex] = useState(0);
 
-  useEffect(() => setStartIndex(0), [items.length]);
+  // Go back to the first page whenever the number of items changes (adjusted while rendering, no extra effect)
+  const [prevLength, setPrevLength] = useState(items.length);
+  if (prevLength !== items.length) {
+    setPrevLength(items.length);
+    setStartIndex(0);
+  }
 
   const showPrev = startIndex > 0;
   const showNext = startIndex + itemsPerPage < items.length;
@@ -50,20 +55,6 @@ export const ChildDashboard: React.FC = () => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [assignments, setAssignments] = useState<Assignment[]>([]);
 
-  useEffect(() => {
-    const token = localStorage.getItem('kiosk_token');
-    const user = JSON.parse(localStorage.getItem('kiosk_user') || '{}');
-    
-    // Security check
-    if (!token || user.role !== 'child') {
-      navigate('/');
-      return;
-    }
-    
-    setCurrentUser(user);
-    fetchChores(user.id);
-  }, []);
-
   const fetchChores = async (userId: number) => {
     try {
       // 1. Fetch fresh user data to get the most accurate balance
@@ -80,6 +71,22 @@ export const ChildDashboard: React.FC = () => {
     }
   };
 
+  useEffect(() => {
+    const token = localStorage.getItem('kiosk_token');
+    const user = JSON.parse(localStorage.getItem('kiosk_user') || '{}');
+    
+    // Security check
+    if (!token || user.role !== 'child') {
+      navigate('/');
+      return;
+    }
+    
+    // Show the stored user right away; the fresh data replaces it once loaded.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setCurrentUser(user);
+    fetchChores(user.id);
+  }, []);
+
   const handleCompleteChore = async (assignmentId: number) => {
     // Optimistic UI update to make the button feel instantly responsive
     setAssignments(prev => prev.map(a => a.id === assignmentId ? { ...a, status: 'awaiting_verification' } : a));
@@ -92,7 +99,7 @@ export const ChildDashboard: React.FC = () => {
       });
       // The backend handles sending the SMS to the adult automatically here
       fetchChores(currentUser!.id); // Refresh to be safe
-    } catch (error) {
+    } catch {
       alert("Network error updating chore.");
       fetchChores(currentUser!.id); // Revert if failed
     }

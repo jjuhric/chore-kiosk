@@ -31,7 +31,12 @@ interface Assignment {
 function Carousel<T>({ items, renderItem, emptyMessage, itemsPerPage = 2 }: { items: T[], renderItem: (item: T) => React.ReactNode, emptyMessage: string, itemsPerPage?: number }) {
   const [startIndex, setStartIndex] = useState(0);
 
-  useEffect(() => setStartIndex(0), [items.length]);
+  // Go back to the first page whenever the number of items changes (adjusted while rendering, no extra effect)
+  const [prevLength, setPrevLength] = useState(items.length);
+  if (prevLength !== items.length) {
+    setPrevLength(items.length);
+    setStartIndex(0);
+  }
 
   const showPrev = startIndex > 0;
   const showNext = startIndex + itemsPerPage < items.length;
@@ -87,17 +92,6 @@ export const AdultDashboard: React.FC = () => {
   const [showAddChore, setShowAddChore] = useState(false);
   const [newChore, setNewChore] = useState({ title: '', type: 'daily', reward_value: 1.00, assigned_day: 0, target_user_id: '' });
 
-  useEffect(() => {
-    const token = localStorage.getItem('kiosk_token');
-    const user = JSON.parse(localStorage.getItem('kiosk_user') || '{}');
-    if (!token || user.role !== 'adult') {
-      navigate('/');
-      return;
-    }
-    setCurrentUser(user);
-    fetchDashboardData();
-  }, []);
-
   const fetchDashboardData = async () => {
     try {
       const usersRes = await fetch('/api/users');
@@ -122,6 +116,19 @@ export const AdultDashboard: React.FC = () => {
       console.error('Failed to fetch dashboard data', error);
     }
   };
+
+  useEffect(() => {
+    const token = localStorage.getItem('kiosk_token');
+    const user = JSON.parse(localStorage.getItem('kiosk_user') || '{}');
+    if (!token || user.role !== 'adult') {
+      navigate('/');
+      return;
+    }
+    // Show the stored user right away; the fresh data replaces it once loaded.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setCurrentUser(user);
+    fetchDashboardData();
+  }, []);
 
   // --- API Handlers ---
 
@@ -165,7 +172,7 @@ export const AdultDashboard: React.FC = () => {
       } else {
         alert('Failed to send QR badge. Check backend console.');
       }
-    } catch (err) {
+    } catch {
       alert('Network error sending QR code.');
     }
   };
@@ -196,7 +203,7 @@ export const AdultDashboard: React.FC = () => {
       } else {
         fetchDashboardData(); // Refresh to show new balance
       }
-    } catch (error) {
+    } catch {
       alert("Network error processing payout.");
     }
   };
@@ -224,7 +231,7 @@ export const AdultDashboard: React.FC = () => {
       ].map(tab => (
         <button 
           key={tab.id}
-          onClick={() => setActiveTab(tab.id as any)}
+          onClick={() => setActiveTab(tab.id as 'approvals' | 'kids' | 'chores')}
           style={{ 
             flex: 1, border: 'none', backgroundColor: activeTab === tab.id ? '#eff6ff' : 'white',
             color: activeTab === tab.id ? '#3b82f6' : '#6b7280', borderTop: activeTab === tab.id ? '4px solid #3b82f6' : '4px solid transparent',

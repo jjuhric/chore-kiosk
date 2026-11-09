@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any -- test doubles */
 // "Same screens, same calls" tests: render each page with a fake server (no network),
 // click through it, and snapshot the exact HTML plus every request the page makes.
 import React from 'react';
