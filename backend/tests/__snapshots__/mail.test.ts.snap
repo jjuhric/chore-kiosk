@@ -1,0 +1,46 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`email: login badge (authController) sends the same badge email and answers the same: badge-message 1`] = `
+{
+  "attachments": undefined,
+  "date": undefined,
+  "from": {
+    "address": "sender@example.test",
+    "name": "",
+  },
+  "headers": {},
+  "html": "
+        <h2>Here is the login badge for Sam</h2>
+        <p>Save this image or print it out to scan at the kiosk.</p>
+        <img src="cid:qrcode_badge" alt="Login QR Code"/>
+      ",
+  "subject": "Login Badge for Sam",
+  "to": [
+    {
+      "address": "parent@example.test",
+      "name": "",
+    },
+  ],
+}
+`;
+
+exports[`email: login badge (authController) sends the same badge email and answers the same: badge-png-hash 1`] = `"8a6fb2a4178b39b49d273d0a9557baee087a397df01d26e9d45a1bd7a4be058a"`;
+
+exports[`email: text message gateway (smsService) sends the same text-gateway email: sms-message 1`] = `
+{
+  "date": undefined,
+  "from": {
+    "address": "sender@example.test",
+    "name": "",
+  },
+  "headers": {},
+  "subject": "",
+  "text": "Chore due!",
+  "to": [
+    {
+      "address": "5551234567@vtext.com",
+      "name": "",
+    },
+  ],
+}
+`;

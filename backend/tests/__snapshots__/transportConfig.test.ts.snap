@@ -1,0 +1,10 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`service: 'gmail' resolves to the same mail server settings 1`] = `
+{
+  "authUser": "a@example.test",
+  "host": "smtp.gmail.com",
+  "port": 465,
+  "secure": true,
+}
+`;
